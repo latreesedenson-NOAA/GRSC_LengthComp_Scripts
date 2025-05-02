@@ -20,7 +20,7 @@ setwd("C:\\Users\\latreese.denson\\Desktop\\SEDAR_98_Models\\DataWorkshop\\GRSC_
 
 # read in clean data ####
 GRSC_Map_Dat <- read.csv("GRSC_Data_for_Mapping.csv")
-GRSC_Table <-read.csv("GRSC_NumberTable.csv")
+GRSC_Table <-read.csv("@GRSC_NumberTable.csv")
 
 # Tables of measured fish by SID ####
 SID_list=unique(GRSC_Map_Dat$SID)
@@ -78,7 +78,7 @@ W_GULF = st_crop(worldmap, xmin = -98, xmax = -90,
 # kncoast_bbox <- kncoast %>% st_as_sf(coords = c("lon", "lat"), crs=4326) %>%
 #   st_bbox() %>% st_as_sfc()
 
-dev.off()
+
 # Entire Gulf habitat type
 ggplot() + geom_sf(data = GULF) + theme_bw()+
   geom_point(data=GRSC_Map_Dat, aes(x=Longitude, y=Latitude,col = HabitatType))

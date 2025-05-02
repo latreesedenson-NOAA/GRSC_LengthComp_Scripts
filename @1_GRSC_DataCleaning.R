@@ -16,10 +16,10 @@ setwd("C:\\Users\\latreese.denson\\Desktop\\SEDAR_98_Models\\DataWorkshop\\GRSC_
 
 # read in raw data sets ####
 # one workbook from FL, AL, MS and TX, one workbook from LA
-sites <- read_excel("Red Snapper length summary_Gulf of Mexico_LDEdit.xlsx", sheet = "Site Coordinants_FL")
-FL_Data <- read_excel("Red Snapper length summary_Gulf of Mexico_LDEdit.xlsx", sheet = "Data_Region_FL")
-AL_MS_TX_Data <- read_excel("Red Snapper length summary_Gulf of Mexico_LDEdit.xlsx", sheet = "Data_Regions_AL_MS_TX")
-LA_Data <-read_excel("LGL_RedSnapper_Louisiana.xlsx", sheet = "Length_Age")
+sites <- read_excel("@Red Snapper length summary_Gulf of Mexico_LDEdit.xlsx", sheet = "Site Coordinants_FL")
+FL_Data <- read_excel("@Red Snapper length summary_Gulf of Mexico_LDEdit.xlsx", sheet = "Data_Region_FL")
+AL_MS_TX_Data <- read_excel("@Red Snapper length summary_Gulf of Mexico_LDEdit.xlsx", sheet = "Data_Regions_AL_MS_TX")
+LA_Data <-read_excel("@LGL_RedSnapper_Louisiana.xlsx", sheet = "Length_Age")
 
 # conversions MTL to FL in cm ###
 alpha = 0.138
