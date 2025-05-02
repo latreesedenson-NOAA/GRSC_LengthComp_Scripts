@@ -207,29 +207,31 @@ LA_West_LFD = LA_Central_clean%>%
   
 
 # Texas - West ####
+# Went from only using data source TAMUCC to all data sources
 TX_Sites = AL_MS_TX_Data %>%filter(Region=="Texas",YearDeployment>=2018,
-                                   YearDeployment<=2019,!is.na(FL_mm),
-                                   DataSource=="TAMUCC")%>%
+                                   YearDeployment<=2019,!is.na(FL_mm))%>%
   select(Region,Latitude,Longitude)%>%
-  count(Region,Latitude,Longitude)%>%rename(RS_measured = n)
+  count(Region,Latitude,Longitude)%>%rename(RS_measured = n)%>%
+  mutate(Longitude = if_else(Longitude > 0, Longitude * -1, Longitude))
 
 TX_descript =AL_MS_TX_Data%>%filter(Region=="Texas",YearDeployment>=2018, 
-                                    YearDeployment<=2019,!is.na(FL_mm),
-                                    DataSource=="TAMUCC")%>%
+                                    YearDeployment<=2019,!is.na(FL_mm))%>%
   select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method)%>%
   distinct()%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR","NR" ))
 
+# some texas data has positive longitude and should be negative
 TX_sites_clean = TX_Sites%>%
-  inner_join(TX_descript, by = c("Latitude", "Longitude"))
+  inner_join(TX_descript, by = c("Latitude", "Longitude"))%>%
+  mutate(Longitude = if_else(Longitude > 0, Longitude * -1, Longitude))
 
 TX_West_clean =  AL_MS_TX_Data %>%filter(Region=="Texas",
                                          YearDeployment>=2018, 
                                          YearDeployment<=2019,
-                                         !is.na(FL_mm),
-                                         DataSource=="TAMUCC")%>%
+                                         !is.na(FL_mm))%>%
   select(YearDeployment,MonthDeployment,DayDeployment,
          Latitude,Longitude, DepthZone, HabitatType, Method,FL_mm)%>%
+  mutate(Longitude = if_else(Longitude > 0, Longitude * -1, Longitude))%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR","NR" ))
 
 # Wide version of data for Mapping

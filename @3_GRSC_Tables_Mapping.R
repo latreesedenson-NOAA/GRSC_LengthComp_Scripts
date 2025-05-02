@@ -20,6 +20,7 @@ setwd("C:\\Users\\latreese.denson\\Desktop\\SEDAR_98_Models\\DataWorkshop\\GRSC_
 
 # read in clean data ####
 GRSC_Map_Dat <- read.csv("GRSC_Data_for_Mapping.csv")
+GRSC_Table <-read.csv("GRSC_NumberTable.csv")
 
 # Tables of measured fish by SID ####
 SID_list=unique(GRSC_Map_Dat$SID)
@@ -30,6 +31,26 @@ Data_summary = GRSC_Map_Dat%>%
   summarize(RS_meas_total = sum(RS_measured)) 
 write.csv(Data_summary,paste0("GRSC_",SID_list[i],"_Data_Summary.csv"))
 } # end loop
+
+# Table Code for proportions ####
+Data_summary2 = GRSC_Map_Dat%>%
+  group_by(Region,HabitatType) %>%             
+  summarize(RS_meas_total = sum(RS_measured))%>%group_by(Region,HabitatType)%>%summarise_all(sum)%>%
+  pivot_wider(names_from = HabitatType,values_from = RS_meas_total)%>%
+  rowwise() %>% 
+  mutate(Total = sum(c_across(where(is.numeric)), na.rm = T))%>%
+  mutate(LCper_NR = (NR/Total)*100, LCper_AR = (AR/Total)*100, LCper_UCB = (UCB/Total)*100)
+write.csv(Data_summary2,"LengthComp_HabitatProportions.csv",row.names = FALSE)
+
+GRSC_tab = GRSC_Table%>%pivot_wider(names_from = HabitatType,values_from = Number)%>%
+  mutate(RSCper_NR = (NR/Total)*100, RSCper_AR = (AR/Total)*100, RSCper_UCB = (UCB/Total)*100)
+write.csv(GRSC_tab,"RSC_HabitatProportions.csv",row.names = FALSE)
+
+# Compare length comp proportions to abundance proportions ####
+LCdata = Data_summary2%>%select(Region,LCper_NR,LCper_AR,LCper_UCB)
+RSCdata = GRSC_tab%>%select(Region,RSCper_NR,RSCper_AR,RSCper_UCB)
+PerDat = merge(LCdata,RSCdata)
+write.csv(PerDat,"LengthCompvsRSC_HabitatProportions.csv",row.names = FALSE)
 
 # Set up maps ####
 my_sf <- st_read(file.path(getwd(),"GOMShape", "GSHHS_f_GOM.shp"))
@@ -57,7 +78,7 @@ W_GULF = st_crop(worldmap, xmin = -98, xmax = -90,
 # kncoast_bbox <- kncoast %>% st_as_sf(coords = c("lon", "lat"), crs=4326) %>%
 #   st_bbox() %>% st_as_sfc()
 
-
+dev.off()
 # Entire Gulf habitat type
 ggplot() + geom_sf(data = GULF) + theme_bw()+
   geom_point(data=GRSC_Map_Dat, aes(x=Longitude, y=Latitude,col = HabitatType))
