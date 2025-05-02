@@ -25,11 +25,19 @@ GRSC_Table <-read.csv("@GRSC_NumberTable.csv")
 # Tables of measured fish by SID ####
 SID_list=unique(GRSC_Map_Dat$SID)
 for(i in 1:length(SID_list)){
+  #i = 3
+  if(SID_list[i]=="West"){
+    Data_summary = GRSC_Map_Dat%>%
+    filter(SID == SID_list[i])%>%
+    group_by(Reg_SID,year,Gear,DataSource,HabitatType) %>%             
+    summarize(RS_meas_total = sum(RS_measured))
+    }else{
 Data_summary = GRSC_Map_Dat%>%
   filter(SID == SID_list[i])%>%
   group_by(Reg_SID,year,Gear,HabitatType) %>%             
-  summarize(RS_meas_total = sum(RS_measured)) 
-write.csv(Data_summary,paste0("GRSC_",SID_list[i],"_Data_Summary.csv"))
+  summarize(RS_meas_total = sum(RS_measured))}
+
+  write.csv(Data_summary,paste0("GRSC_",SID_list[i],"_Data_Summary.csv"))
 } # end loop
 
 # Table Code for proportions ####

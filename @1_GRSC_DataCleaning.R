@@ -42,14 +42,14 @@ FL_East_clean = east_dat%>%dplyr::filter(!is.na(east_dat$`Length_count`))%>% # r
 # Wide version of data for Mapping
 FL_East_Map = FL_East_clean%>%
   select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured)%>%
-  mutate(SID = "East",Reg_SID = "FL_E", Gear = "ROV")
+  mutate(SID = "East",Reg_SID = "FL_E", Gear = "ROV",DataSource ="UF")
 
 # Long version of data for LFD
 FL_East_LFD =FL_East_clean%>%
   pivot_longer(cols = matches("^L[0-9]+$"),names_to = "L_bin",names_prefix = "L", # pivot longer is needed for ggplot histogram
   values_to = "TL_mm",values_drop_na = TRUE)%>%
   select(year,Region,HabitatType,DepthZone,L_bin,TL_mm)%>%              # limiting the number of columns we see
-  mutate(SID = "East",Reg_SID = "FL_E", Gear = "ROV")%>%                # add columns for comparison with other data sources
+  mutate(SID = "East",Reg_SID = "FL_E", Gear = "ROV",DataSource ="UF")%>%                # add columns for comparison with other data sources
   mutate(FL_cm=alpha+beta*(round(TL_mm)/10))%>%
   select(-TL_mm, -L_bin)
 
@@ -62,24 +62,24 @@ central_dat = FL_Data[FL_Data$`Reef_Name` %in%sites_central$`Reef_Name`,]
 central_dat = merge(central_dat,sites_central,all.x = TRUE)
 central_dat_clean = central_dat%>%dplyr::filter(!is.na(central_dat$`Length_count`))%>%
   separate("Sample Date", into = c("year", "month", "day"), sep = "-")%>%
-  mutate(Region = "Florida")
+  mutate(Region = "Florida",DataSource ="UF")
 
 FL_Central_clean = central_dat_clean%>%
   mutate(HabitatType = if_else(str_detect(`Habitat_Type`, "AR"), "AR", "NR"))%>%
-  mutate(DepthZone="Unknown", Region="Florida")%>%
+  mutate(DepthZone="Unknown", Region="Florida",DataSource ="UF")%>%
   rename(RS_measured = `Length_count`)%>%select(-Habitat_Type)
 
 # Wide version of data for Mapping
 FL_Central_Map = FL_Central_clean%>%
   select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured)%>%
-  mutate(SID = "Central",Reg_SID = "FL_C", Gear = "ROV")
+  mutate(SID = "Central",Reg_SID = "FL_C", Gear = "ROV",DataSource ="UF")
 
 # Long version of data for LFD
 FL_Central_LFD =FL_Central_clean%>%
   pivot_longer(cols = matches("^L[0-9]+$"),names_to = "L_bin",names_prefix = "L", # pivot longer is needed for ggplot histogram
                values_to = "TL_mm",values_drop_na = TRUE)%>%
   select(year,Region,HabitatType,DepthZone,L_bin,TL_mm)%>%              # limiting the number of columns we see
-  mutate(SID = "Central",Reg_SID = "FL_C", Gear = "ROV")%>%                # add columns for comparison with other data sources
+  mutate(SID = "Central",Reg_SID = "FL_C", Gear = "ROV",DataSource ="UF")%>%                # add columns for comparison with other data sources
   mutate(FL_cm=alpha+beta*(round(TL_mm)/10))%>%
   select(-TL_mm,-L_bin)
 
@@ -92,7 +92,7 @@ AL_Sites = AL_MS_TX_Data %>%filter(Region=="Alabama",
   select(Region,Latitude,Longitude)%>%count(Region,Latitude,Longitude)%>%rename(RS_measured = n)
 
 AL_descript =AL_MS_TX_Data%>%filter(Region=="Alabama",YearDeployment>=2018, YearDeployment<=2019,!is.na(FL_mm))%>%
-  select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method)%>%distinct()%>%
+  select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method,DataSource)%>%distinct()%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR", 
                                if_else(str_detect(`HabitatType`, "Natural"), "NR", 
                                        if_else(str_detect(`HabitatType`, "Unconsolidated"),"UCB",
@@ -102,7 +102,7 @@ AL_sites_clean = AL_Sites%>%
   inner_join(AL_descript, by = c("Latitude", "Longitude"))                  # bring together descriptive data of sites
 
 AL_Central_clean =  AL_MS_TX_Data %>%filter(Region=="Alabama",YearDeployment>=2018, YearDeployment<=2019,!is.na(FL_mm))%>%
-  select(YearDeployment,MonthDeployment,DayDeployment,Latitude,Longitude, DepthZone, HabitatType, Method,FL_mm)%>%
+  select(YearDeployment,MonthDeployment,DayDeployment,Latitude,Longitude, DepthZone, HabitatType, Method,DataSource,FL_mm)%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR", 
                                if_else(str_detect(`HabitatType`, "Natural"), "NR", 
                                        if_else(str_detect(`HabitatType`, "Unconsolidated"),"UCB",
@@ -112,11 +112,11 @@ AL_Central_clean =  AL_MS_TX_Data %>%filter(Region=="Alabama",YearDeployment>=20
 AL_Central_Map = AL_sites_clean %>%
   mutate(SID = "Central",Reg_SID = "AL_C")%>%
   rename("Gear"="Method","year"="YearDeployment")%>%
-  select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured,SID,Reg_SID,Gear)
+  select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured,SID,Reg_SID,Gear, DataSource)
  
   
 # Long version of data for LFD
-AL_Central_LFD = AL_Central_clean%>%select(YearDeployment,HabitatType,DepthZone,Method,FL_mm)%>%
+AL_Central_LFD = AL_Central_clean%>%select(YearDeployment,HabitatType,DepthZone,Method,DataSource,FL_mm)%>%
   mutate(Region ="Alabama", SID ="Central",Reg_SID ="AL_C")%>%
   mutate(FL_cm = FL_mm/10)%>%
   rename("Gear"="Method","year"="YearDeployment")%>%
@@ -135,7 +135,7 @@ MS_descript =AL_MS_TX_Data%>%filter(Region=="Mississippi",
                                     YearDeployment>=2018, 
                                     YearDeployment<=2019,
                                     !is.na(FL_mm))%>%
-  select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method)%>%
+  select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method, DataSource)%>%
   distinct()%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR", if_else(str_detect(`HabitatType`, "Natural"), "NR", if_else(str_detect(`HabitatType`, "Unconsolidated"),"UCB",if_else(str_detect(`HabitatType`, "Unidentified"),"UknS","NS")))))
 
@@ -148,7 +148,7 @@ MS_Central_clean =  AL_MS_TX_Data %>%filter(Region=="Mississippi",
                                             !is.na(FL_mm))%>%
   select(YearDeployment,MonthDeployment,DayDeployment,
          Latitude,Longitude, DepthZone, 
-         HabitatType, Method,FL_mm)%>%
+         HabitatType, Method,DataSource,FL_mm)%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR", 
                                if_else(str_detect(`HabitatType`, "Natural"), "NR", 
                                        if_else(str_detect(`HabitatType`, "Unconsolidated"),"UCB",
@@ -158,11 +158,11 @@ MS_Central_clean =  AL_MS_TX_Data %>%filter(Region=="Mississippi",
 MS_Central_Map = MS_sites_clean %>%
   mutate(SID = "Central",Reg_SID = "MS_C")%>%
   rename("Gear"="Method","year"="YearDeployment")%>%
-  select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured,SID,Reg_SID,Gear)
+  select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured,SID,Reg_SID,Gear, DataSource)
 
 # Long version of data for LFD
 MS_Central_LFD = MS_Central_clean%>%select(YearDeployment,HabitatType,
-                                           DepthZone,Method,FL_mm)%>%
+                                           DepthZone,Method,DataSource,FL_mm)%>%
   mutate(Region ="Mississippi", SID ="Central",Reg_SID ="MS_C")%>%
   mutate(FL_cm = FL_mm/10)%>%
   rename("Gear"="Method","year"="YearDeployment")%>%
@@ -184,7 +184,7 @@ LA_sites_clean = LA_sites%>%
   inner_join(LA_descript, by = c("Lat", "Lon"))%>%select(-siteType)
 
 LA_Central_clean =  LA_Data %>%select(Year,Lat,Lon, depthZone, siteType,fork_length_mm)%>%
-  mutate(Gear = "HL",Region="Lousiana")%>%
+  mutate(Gear = "HL",Region="Lousiana",DataSource = "LGL")%>%
   mutate(HabitatType = if_else(str_detect(siteType, "Artificial"), "AR", 
                                if_else(str_detect(siteType, "Natural"), "NR", 
                                        if_else(str_detect(siteType, "UCB"),"UCB",
@@ -193,17 +193,17 @@ LA_Central_clean =  LA_Data %>%select(Year,Lat,Lon, depthZone, siteType,fork_len
 
 # Wide version of data for Mapping
 LA_West_Map = LA_sites_clean %>%
-  mutate(SID = "West",Reg_SID = "LA_W",Gear="HL")%>%
+  mutate(SID = "West",Reg_SID = "LA_W",Gear="HL",DataSource = "LGL")%>%
   rename("year"="Year", "Longitude" ="Lon","Latitude"="Lat","DepthZone"="depthZone")%>%
   select(year,Latitude,Longitude,Region,HabitatType,
-         DepthZone,RS_measured,SID,Reg_SID,Gear)
+         DepthZone,RS_measured,SID,Reg_SID,Gear, DataSource)
   
 # Long version of data for LFD
 LA_West_LFD = LA_Central_clean%>%
   mutate(SID ="West",Reg_SID ="LA_W")%>%
   mutate(FL_cm = fork_length_mm/10)%>%
   rename("year"="Year","DepthZone"="depthZone")%>%
-  select(year,HabitatType,DepthZone,Gear,Region,SID,Reg_SID,FL_cm)
+  select(year,HabitatType,DepthZone,Gear,Region,SID,Reg_SID,DataSource,FL_cm)
   
 
 # Texas - West ####
@@ -216,7 +216,7 @@ TX_Sites = AL_MS_TX_Data %>%filter(Region=="Texas",YearDeployment>=2018,
 
 TX_descript =AL_MS_TX_Data%>%filter(Region=="Texas",YearDeployment>=2018, 
                                     YearDeployment<=2019,!is.na(FL_mm))%>%
-  select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method)%>%
+  select(YearDeployment,Latitude,Longitude, DepthZone, HabitatType, Method,DataSource)%>%
   distinct()%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR","NR" ))
 
@@ -230,7 +230,7 @@ TX_West_clean =  AL_MS_TX_Data %>%filter(Region=="Texas",
                                          YearDeployment<=2019,
                                          !is.na(FL_mm))%>%
   select(YearDeployment,MonthDeployment,DayDeployment,
-         Latitude,Longitude, DepthZone, HabitatType, Method,FL_mm)%>%
+         Latitude,Longitude, DepthZone, HabitatType, Method,DataSource,FL_mm)%>%
   mutate(Longitude = if_else(Longitude > 0, Longitude * -1, Longitude))%>%
   mutate(HabitatType = if_else(str_detect(`HabitatType`, "Artificial"), "AR","NR" ))
 
@@ -238,10 +238,10 @@ TX_West_clean =  AL_MS_TX_Data %>%filter(Region=="Texas",
 TX_West_Map = TX_sites_clean %>%
   mutate(SID = "West",Reg_SID = "TX_W")%>%
   rename("Gear"="Method","year"="YearDeployment")%>%
-  select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured,SID,Reg_SID,Gear)
+  select(year,Latitude,Longitude,Region,HabitatType,DepthZone,RS_measured,SID,Reg_SID,Gear,DataSource)
 
 # Long version of data for LFD
-TX_West_LFD = TX_West_clean%>%select(YearDeployment,HabitatType,DepthZone,Method,FL_mm)%>%
+TX_West_LFD = TX_West_clean%>%select(YearDeployment,HabitatType,DepthZone,Method,DataSource,FL_mm)%>%
   mutate(Region ="Texas", SID ="West",Reg_SID ="TX_W")%>%
   mutate(FL_cm = FL_mm/10)%>%
   rename("Gear"="Method","year"="YearDeployment")%>%

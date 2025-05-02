@@ -39,7 +39,7 @@ for(i in 1:dim(options)[1]){
     
     #Histogram of LFDs
     ggplot(data,aes(x=FL_cm))+
-      geom_histogram(aes(y=after_stat(count/sum(count))),color="black", fill="white",breaks =seq(10,115, by =5))+
+      geom_histogram(aes(y=after_stat(width * density)),color="black", fill="white",breaks =seq(10,115, by =5))+
       labs(y = "Proportion",x ="FL_cm",title= paste0(graph_title, " n = ",sum_measured))+
       geom_vline(xintercept = med_val, color = "red", linetype= "dashed", linewidth = 1)+
       annotate("text", x = med_val+20,y = 1, label =paste("median size = ", round(med_val),"cm"), color = "red")+
@@ -76,7 +76,7 @@ for(i in 1:dim(options2)[1]){
     
     #Histogram of LFDs
     ggplot(data,aes(x=FL_cm))+
-      geom_histogram(aes(y=after_stat(count/sum(count))),color="black", fill="white",breaks =seq(10,115, by =5))+
+      geom_histogram(aes(y=after_stat(width * density)),color="black", fill="white",breaks =seq(10,115, by =5))+
       labs(y = "Proportion",x ="FL_cm",title= paste0(graph_title, " n = ",sum_measured))+
       geom_vline(xintercept = med_val, color = "red", linetype= "dashed", linewidth = 1)+
       annotate("text", x = med_val+20,y = 1, label =paste("median size = ", round(med_val),"cm"), color = "red")+
@@ -113,9 +113,9 @@ for(i in 1:length(SID_list)){
   }
   
   ggplot(Data,aes(x=FL_cm))+
-    geom_histogram(aes(y=after_stat(count/sum(count))),color="black", fill="white",breaks =seq(10,115, by =5))+
+    geom_histogram(aes(y=after_stat(width * density)),color="black", fill="white",breaks =seq(10,115, by =5))+
     facet_grid(year~HabitatType)+
-    geom_text(aes(x = 60, y = .2, label = paste0("med=",round(mean_FL_cm,2)," n=",count)), data = Year_mean)
+    geom_text(aes(x = 60, y = .5, label = paste0("med=",round(mean_FL_cm,2)," n=",count)), data = Year_mean)
   labs(y = "Proportion",x ="FL_cm")+theme_minimal()  
   
   Filename = paste0(SID_list[i],"_LFD_Year_Habitat.jpg")
@@ -132,9 +132,9 @@ for(i in 1:length(SID_list)){
               count = n())
   
   ggplot(Data,aes(x=FL_cm))+
-    geom_histogram(aes(y=after_stat(count/sum(count))),color="black", fill="white",breaks =seq(10,115, by =5))+
+    geom_histogram(aes(y=after_stat(width * density)),color="black", fill="white",breaks =seq(10,115, by =5))+
     facet_grid(Gear~year)+
-    geom_text(aes(x = 60, y = .2, label = paste0("med =",round(mean_FL_cm,2)," n=",count)), data = Year_mean)
+    geom_text(aes(x = 70, y = .5, label = paste0("med =",round(mean_FL_cm,2)," n=",count)), data = Year_mean)
   labs(y = "Proportion",x ="FL_cm")+theme_minimal()  
   
   Filename = paste0(SID_list[i],"_LFD_Year_Gear.jpg")
@@ -150,9 +150,9 @@ Mod1 = lm(FL_cm~year+Region+HabitatType+SID+Gear+HabitatType:Gear,data = GRSC_LF
 anova(Mod1)%>%as.data.frame() %>% write.csv(file ="LFD_ANOVA.csv")
 
 ggplot(GRSC_LFD_Dat,aes(x=FL_cm))+
-  geom_histogram(aes(y=after_stat(count/sum(count))),color="black", fill="white",breaks =seq(10,115, by =5))+
+  geom_histogram(aes(y=after_stat(width * density)),color="black", fill="white",breaks =seq(10,115, by =5))+
   facet_grid(year~SID)+
-  geom_text(aes(x = 60, y = .2, label = paste0("med=",round(mean_FL_cm,2)," n=",count)), data = Year_SID_mean)
+  geom_text(aes(x = 60, y = .5, label = paste0("med=",round(mean_FL_cm,2)," n=",count)), data = Year_SID_mean)
   labs(y = "Proportion",x ="FL_cm")+theme_minimal()
   ggsave("LFD_Year_SID.jpg",width = 8, height = 4, dpi = 300, units = "in")
 
@@ -161,9 +161,9 @@ ggplot(GRSC_LFD_Dat,aes(x=FL_cm))+
     summarize(mean_FL_cm = median(FL_cm),
               count = n())
   ggplot(GRSC_LFD_Dat,aes(x=FL_cm))+
-    geom_histogram(aes(y=after_stat(count/sum(count))),color="black", fill="white",breaks =seq(10,115, by =5))+
+    geom_histogram(aes(y=after_stat(width * density)),color="black", fill="white",breaks =seq(10,115, by =5))+
     facet_grid(~SID)+
-    geom_text(aes(x = 60, y = .2, label = paste0("med=",round(mean_FL_cm,2)," n=",count)), data = Year_SID_mean)
+    geom_text(aes(x = 60, y = .5, label = paste0("med=",round(mean_FL_cm,2)," n=",count)), data = Year_SID_mean)
   labs(y = "Proportion",x ="FL_cm")+theme_minimal()
   ggsave("LFD_SID.jpg",width = 8, height = 4, dpi = 300, units = "in")  
   
